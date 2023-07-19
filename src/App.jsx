@@ -1,35 +1,85 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import { Tweet } from "./tweet";
+import { Tweetform } from "./TweetForm";
+import { TweetList } from "./TweetList";
 
-function App() {
-  const [count, setCount] = useState(0)
+const DEFAULT_TWEET = [
+    {
+      id:0,
+      name:"Didier", 
+      content:"je gère", 
+      like:150,
+    },
+    {
+      id:1,
+      name:"Betsy", 
+      content:"c'est facile", 
+      like:130,
+    },
+    {
+      id:2,
+      name:"Yannick", 
+      content:"j'aime les chaussures", 
+      like:160,
+    },
+    {
+      id:3,
+      name:"Ally", 
+      content:"force taureau", 
+      like:120,
+    },
+    {
+      id:4,
+      name:"Ludmi", 
+      content:"que la lumière soit", 
+      like:110,
+    },
 
-  return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+  ]
+
+const useTweets = () => {
+  const [tweets, setTweets] = useState(DEFAULT_TWEET);
+
+  const addTweet = (tweet) => {
+    setTweets((curr) => {
+      const newTweet = {
+      id: curr[curr.length -1]?.id +1 ?? 0,
+      name: tweet.name,
+      content: tweet.content,
+      like : 0,
+    };
+
+    return [...tweets, newTweet]
+    })
+  }
+
+  const onDelete = (tweetId) => {
+    setTweets((curr) => curr.filter((tweet) => tweet.id !== tweetId) )
+  }
+
+  const onLike = (tweetId) => {
+    setTweets(curr => {
+      const copyTweet = [... curr]
+
+      const likedTweet = copyTweet.find(tweet => tweet.id === tweetId)
+      likedTweet.like += 1
+
+      return copyTweet
+    })
+  }
+  return {onLike, onDelete, addTweet, tweets}
 }
 
-export default App
+function App() {
+  
+  const {onLike, onDelete, addTweet, tweets} = useTweets()
+
+  return (
+      <div>
+        <Tweetform onSubmit={addTweet}/>
+        <TweetList tweets={tweets} onDelete={onDelete} onLike={onLike} />
+    </div>
+  );
+}
+
+export default App;
